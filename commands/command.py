@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+import glob
 import sys
 import datetime
 import traceback
@@ -46,7 +47,8 @@ options:
     aliases: []
   creates:
     description:
-      - a filename, when it already exists, this step will B(not) be run.
+      - A filepath or fileglob. If path exists or the glob finds any matches
+      then this module is skipped.
     required: no
     default: null
   removes:
@@ -161,7 +163,7 @@ def main():
         # and the filename already exists.  This allows idempotence
         # of command executions.
         v = os.path.expanduser(creates)
-        if os.path.exists(v):
+        if os.path.exists(v) or glob.glob(v):
             module.exit_json(
                 cmd=args,
                 stdout="skipped, since %s exists" % v,

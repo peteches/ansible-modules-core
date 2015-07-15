@@ -20,6 +20,7 @@
 #
 # see examples/playbooks/uri.yml
 
+import glob
 import shutil
 import tempfile
 import base64
@@ -98,7 +99,8 @@ options:
     default: "safe"
   creates:
     description:
-      - a filename, when it already exists, this step will not be run.
+      - A filepath or fileglob. If path exists or the glob finds any matches
+      then this module is skipped.
     required: false
   removes:
     description:
@@ -380,7 +382,7 @@ def main():
         # and the filename already exists.  This allows idempotence
         # of uri executions.
         creates = os.path.expanduser(creates)
-        if os.path.exists(creates):
+        if os.path.exists(creates) or glob.glob(creates):
             module.exit_json(stdout="skipped, since %s exists" % creates, skipped=True, changed=False, stderr=False, rc=0)
 
     if removes is not None:
